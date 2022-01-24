@@ -22,7 +22,7 @@ jobs:
 
       # Build
       - uses: game-ci/unity-builder@v2
-        evn:
+        env:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
           UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
