@@ -7,7 +7,7 @@ on:
 jobs:
   build:
     name: Build for StandaloneWindows64
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       # Checkout
       - name: Checkout Repo
