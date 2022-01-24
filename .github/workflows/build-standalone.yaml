@@ -1,9 +1,6 @@
 name: build-standalone
 on:
-  push:
-    branches:
-      - production
-      - 'releases/**'
+  workflow_dispatch: {}
 jobs:
   build:
     name: Build for StandaloneWindows64
