@@ -1,9 +1,9 @@
-name: build-standalone
+name: build-iOS
 on:
   workflow_dispatch: {}
 jobs:
   build:
-    name: Build for StandaloneWindows64
+    name: Build for iOS
     runs-on: ubuntu-latest
     steps:
       # Checkout
