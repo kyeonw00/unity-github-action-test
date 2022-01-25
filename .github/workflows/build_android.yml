@@ -55,5 +55,5 @@ jobs:
         with:
           serviceAccountJson: service_account.json
           packageName: com.example.appName
-          releaseFile: build.aab
+          releaseFile: build
           track: internal
