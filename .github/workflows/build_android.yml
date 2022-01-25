@@ -11,38 +11,35 @@ jobs:
         uses: actions/checkout@v2
         with:
           lfs: true
-      
-      - name: Extract Base64
-        run: base64 user.keystore
-        
+          
       # Cache
-      # - name: Cache something
-      #   uses: actions/cache@v2
-      #   with:
-      #     path: Library
-      #     key: Library-${{ hashFiles('Assets/**', 'Packages/**','ProjectSettings/**') }}
-      #     restore-keys: |
-      #       Library-
+      - name: Cache something
+        uses: actions/cache@v2
+        with:
+          path: Library
+          key: Library-${{ hashFiles('Assets/**', 'Packages/**','ProjectSettings/**') }}
+          restore-keys: |
+            Library-
 
       # Build
-      # - uses: game-ci/unity-builder@v2
-      #   id: androidBuildStep
-      #   env:
-      #     UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-      #     UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-      #     UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
-      #   with:
-      #     targetPlatform: Android
-      #     unityVersion: auto
-      #     androidAppBundle: true
-      #     androidKeystoreName: user.keystore
-      #     androidKeystoreBase64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-      #     androidKeystorePass: ${{ secrets.ANDROID_KEYSTORE_PASS }}
-      #     androidKeyaliasName: ${{ secrets.ANDROID_KEYALIASE_NAME }}
-      #     androidKeyaliasPass: ${{ secrets.ANDROID_KEYALIASE_PASS }}
+      - uses: game-ci/unity-builder@v2
+        id: androidBuildStep
+        env:
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+          UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
+        with:
+          targetPlatform: Android
+          unityVersion: auto
+          androidAppBundle: true
+          androidKeystoreName: user.keystore
+          androidKeystoreBase64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          androidKeystorePass: ${{ secrets.ANDROID_KEYSTORE_PASS }}
+          androidKeyaliasName: ${{ secrets.ANDROID_KEYALIASE_NAME }}
+          androidKeyaliasPass: ${{ secrets.ANDROID_KEYALIASE_PASS }}
 
       # Output
-      # - uses: actions/upload-artifact@v2
-      #   with:
-      #     name: Build
-      #     path: build
+      - uses: actions/upload-artifact@v2
+        with:
+          name: Build
+          path: build
