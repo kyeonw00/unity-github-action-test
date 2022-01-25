@@ -2,23 +2,33 @@ name: build-standalone
 on:
   workflow_dispatch: {}
 jobs:
-  build:
-    name: Build for StandaloneWindows64
+  buildForAllProductionPlatforms:
+    name: Build for ${{ matrix.targetPlatform }}
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        targetPlatform:
+          - StandaloneWindows64
+          - StandaloneWindows
+          - StandaloneLinux
+          - StandaloneOSX
+          - iOS
+          - Android
     steps:
       # Checkout
       - name: Checkout Repo
         uses: actions/checkout@v2
         with:
+          fetch-depth: 0
           lfs: true
         
       # Cache
       - uses: actions/cache@v2
         with:
           path: Library
-          key: Library-${{ hashFiles('Assets/**', 'Packages/**','ProjectSettings/**') }}
-          restore-keys: |
-            Library-
+          key: Library-${{ matrix.targetPlatform }}
+          restore-keys: Library-
 
       # Build
       - uses: game-ci/unity-builder@v2
@@ -27,11 +37,11 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
           UNITY_SERIAL: ${{ secrets.UNITY_SERIAL }}
         with:
-          targetPlatform: StandaloneWindows64
+          targetPlatform: ${{ matrix.targetPlatform }}
           unityVersion: auto
 
       # Output
       - uses: actions/upload-artifact@v2
         with:
-          name: Build
-          path: build
+          name: Build-${{ matrix.targetPlatform }}
+          path: build/${{ matrix.targetPlatform }}
