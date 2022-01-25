@@ -13,7 +13,8 @@ jobs:
           lfs: true
         
       # Cache
-      - uses: actions/cache@v2
+      - name: Cache something
+        uses: actions/cache@v2
         with:
           path: Library
           key: Library-${{ hashFiles('Assets/**', 'Packages/**','ProjectSettings/**') }}
@@ -22,6 +23,7 @@ jobs:
 
       # Build
       - uses: game-ci/unity-builder@v2
+        id: androidBuildStep
         env:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
@@ -29,8 +31,15 @@ jobs:
         with:
           targetPlatform: Android
           unityVersion: auto
+          androidAppBundle: false
+          androidKeystoreName: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          androidKeystorePass: ${{ secrets.ANDROID_KEYSTORE_PASS }}
+          androidKeyaliasName: ${{ secrets.ANDROID_KEYALIASE_NAME }}
+          androidKeyaliasPass: ${{ secrets.ANDROID_KEYALIASE_PASS }}
 
       # Output
+      - run: echo 'Project Version: ${{ steps.androidBuildStep.outputs.buildVersion }}'
+
       - uses: actions/upload-artifact@v2
         with:
           name: Build
