@@ -1,4 +1,4 @@
-name: build-standalone
+name: build for all production platforms
 on:
   workflow_dispatch: {}
 jobs:
