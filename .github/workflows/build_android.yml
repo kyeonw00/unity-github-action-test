@@ -32,6 +32,7 @@ jobs:
           targetPlatform: Android
           unityVersion: auto
           androidAppBundle: false
+          androidKeystoreName: .github\workflows\secrets\user.keystore
           androidKeystoreBase64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           androidKeystorePass: ${{ secrets.ANDROID_KEYSTORE_PASS }}
           androidKeyaliasName: ${{ secrets.ANDROID_KEYALIASE_NAME }}
