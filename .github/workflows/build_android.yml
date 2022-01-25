@@ -13,7 +13,7 @@ jobs:
           lfs: true
           
       # Cache
-      - name: Cache something
+      - name: Cache Library
         uses: actions/cache@v2
         with:
           path: Library
@@ -22,7 +22,8 @@ jobs:
             Library-
 
       # Build
-      - uses: game-ci/unity-builder@v2
+      - name: Build UnityPlayer
+        uses: game-ci/unity-builder@v2
         id: androidBuildStep
         env:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
@@ -39,7 +40,20 @@ jobs:
           androidKeyaliasPass: ${{ secrets.ANDROID_KEYALIASE_PASS }}
 
       # Output
-      - uses: actions/upload-artifact@v2
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
         with:
           name: Build
           path: build
+
+      - name: Create service_account.json
+        id: createServiceAccount
+        run: echo '${{ secrets.SERVICE_ACCOUNT_JSON }}' > service_account.json
+
+      - name: Upload to GooglePlay
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: service_account.json
+          packageName: com.example.appName
+          releaseFile: build.aab
+          track: internal
