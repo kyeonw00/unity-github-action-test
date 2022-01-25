@@ -38,7 +38,8 @@ jobs:
           androidKeyaliasPass: ${{ secrets.ANDROID_KEYALIASE_PASS }}
 
       # Output
-      - run: echo 'Project Version: ${{ steps.androidBuildStep.outputs.buildVersion }}'
+      - name: Get build version
+        run: echo "Project Version: ${{ steps.androidBuildStep.outputs.buildVersion }}"
 
       - uses: actions/upload-artifact@v2
         with:
