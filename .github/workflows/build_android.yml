@@ -7,24 +7,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Checkout
-      - name: Checkout Repo
+      - name: Checkout Repository
+        id: checkoutRepository
         uses: actions/checkout@v2
         with:
           lfs: true
           
       # Cache
       - name: Cache Library
+        id: cacheLibrary
         uses: actions/cache@v2
         with:
           path: Library
           key: Library-${{ hashFiles('Assets/**', 'Packages/**','ProjectSettings/**') }}
           restore-keys: |
-            Library-
+            Library-Android
 
       # Build
       - name: Build UnityPlayer
         uses: game-ci/unity-builder@v2
-        id: androidBuildStep
+        id: unityBuildStep
         env:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
@@ -43,8 +45,8 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: Build
-          path: build
+          name: build-Android
+          path: build/Android
 
       - name: Create service_account.json
         id: createServiceAccount
@@ -57,3 +59,13 @@ jobs:
           packageName: com.example.appName
           releaseFile: build
           track: internal
+          
+      - name: Return Unity License
+        uses: game-ci/unity-return-license@v1
+        if: always()
+      
+      - name: Cleanup to avoid storage limit
+        if: always()
+        uses: geekyeggo/delete-artifact@v1
+        with:
+          name: build-Android
