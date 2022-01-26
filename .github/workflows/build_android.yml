@@ -1,6 +1,7 @@
 name: build-android
 on:
   workflow_dispatch: {}
+  
 jobs:
   build:
     name: Build for Android
@@ -22,7 +23,11 @@ jobs:
           key: Library-${{ hashFiles('Assets/**', 'Packages/**','ProjectSettings/**') }}
           restore-keys: |
             Library-Android
-
+      
+      # Encode keystore to Base64
+      - name: Extract base64
+        run: base64 keystoreName.keystore
+        
       # Build
       - name: Build UnityPlayer
         uses: game-ci/unity-builder@v2
@@ -48,10 +53,12 @@ jobs:
           name: build-Android
           path: build/Android
 
+      # Extract service_account.json file from secrets
       - name: Create service_account.json
         id: createServiceAccount
         run: echo '${{ secrets.SERVICE_ACCOUNT_JSON }}' > service_account.json
 
+      # Upload to googleplay
       - name: Upload to GooglePlay
         uses: r0adkll/upload-google-play@v1
         with:
@@ -59,11 +66,13 @@ jobs:
           packageName: com.example.appName
           releaseFile: build
           track: internal
-          
+      
+      # Return unity license
       - name: Return Unity License
         uses: game-ci/unity-return-license@v1
         if: always()
       
+      # Delete cached build
       - name: Cleanup to avoid storage limit
         if: always()
         uses: geekyeggo/delete-artifact@v1
