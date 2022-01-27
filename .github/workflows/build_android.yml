@@ -1,29 +1,37 @@
 name: build-android
 on:
   workflow_dispatch: {}
+  
 jobs:
   build:
     name: Build for Android
     runs-on: ubuntu-latest
     steps:
       # Checkout
-      - name: Checkout Repo
+      - name: Checkout Repository
+        id: checkoutRepository
         uses: actions/checkout@v2
         with:
           lfs: true
-        
+          
       # Cache
-      - name: Cache something
+      - name: Cache Library
+        id: cacheLibrary
         uses: actions/cache@v2
         with:
           path: Library
           key: Library-${{ hashFiles('Assets/**', 'Packages/**','ProjectSettings/**') }}
           restore-keys: |
-            Library-
-
+            Library-Android
+      
+      # Encode keystore to Base64
+      - name: Extract base64
+        run: base64 keystoreName.keystore
+        
       # Build
-      - uses: game-ci/unity-builder@v2
-        id: androidBuildStep
+      - name: Build UnityPlayer
+        uses: game-ci/unity-builder@v2
+        id: unityBuildStep
         env:
           # UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }} // use this for personal license
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
@@ -32,17 +40,42 @@ jobs:
         with:
           targetPlatform: Android
           unityVersion: auto
-          androidAppBundle: false
-          androidKeystoreName: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          androidAppBundle: true
+          androidKeystoreName: user.keystore
+          androidKeystoreBase64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           androidKeystorePass: ${{ secrets.ANDROID_KEYSTORE_PASS }}
           androidKeyaliasName: ${{ secrets.ANDROID_KEYALIASE_NAME }}
           androidKeyaliasPass: ${{ secrets.ANDROID_KEYALIASE_PASS }}
 
       # Output
-      - name: Get build version
-        run: echo "Project Version: ${{ steps.androidBuildStep.outputs.buildVersion }}"
-
-      - uses: actions/upload-artifact@v2
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
         with:
-          name: Build
-          path: build
+          name: build-Android
+          path: build/Android
+
+      # Extract service_account.json file from secrets
+      - name: Create service_account.json
+        id: createServiceAccount
+        run: echo '${{ secrets.SERVICE_ACCOUNT_JSON }}' > service_account.json
+
+      # Upload to googleplay
+      - name: Upload to GooglePlay
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: service_account.json
+          packageName: com.example.appName
+          releaseFile: build
+          track: internal
+      
+      # Return unity license
+      - name: Return Unity License
+        uses: game-ci/unity-return-license@v1
+        if: always()
+      
+      # Delete cached build
+      - name: Cleanup to avoid storage limit
+        if: always()
+        uses: geekyeggo/delete-artifact@v1
+        with:
+          name: build-Android
